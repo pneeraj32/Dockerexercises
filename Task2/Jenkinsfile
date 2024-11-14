@@ -1,4 +1,7 @@
 pipeline {
+        environment {
+            MYSQL_ROOT_PASSWORD = credentials("MYSQL_ROOT_PASSWORD")
+        }
     agent any
     stages {
         stage("Run Script"){
