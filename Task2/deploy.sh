@@ -5,21 +5,20 @@ docker rm -f $(docker ps -qa)
 docker network create trio-task-network
 #create a volume
 docker volume create new-volume
-# build flask and mysql
-docker build -t trio-task-mysql:5.7 db
-docker build -t trio-task-flask-app:latest flask-app
+
 # run mysql container
 docker run -d \
     -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
     --name mysql \
     --network trio-task-network \
-    trio-task-mysql:5.7
+    -v new-volume:/var/lib/mysql \
+    ${DOCKERHUB_CREDENTIALS_USR}/trio-task-mysql:5.7
 # run flask container
 docker run -d \
     -e MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD} \
     --name flask-app \
     --network trio-task-network \
-    trio-task-flask-app:latest
+    ${DOCKERHUB_CREDENTIALS_USR}/trio-task-flask-app:latest
 # run the nginx container
 docker run -d \
     --name nginx \
@@ -28,4 +27,5 @@ docker run -d \
     --mount type=bind,source=$(pwd)/nginx/nginx.conf,target=/etc/nginx/nginx.conf \
     nginx:latest
 # show running containers
+sleep 5
 docker ps -a
